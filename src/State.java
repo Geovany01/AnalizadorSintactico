@@ -1,23 +1,5 @@
 import java.util.Objects;
 
-//public class State {
-//    String name;
-//    boolean isFinal;
-//
-//    public State(String name, boolean isFinal) {
-//        this.name = name;
-//        this.isFinal = isFinal;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public boolean isFinalState() {
-//        return isFinal;
-//    }
-//}
-
 class State {
     private String name;
     private boolean isFinal;
