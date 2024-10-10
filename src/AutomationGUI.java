@@ -144,15 +144,6 @@ class AutomatonGUI extends JFrame {
         drawPanel.setAutomaton(automaton);
     }
 
-//    private void validateString() {
-//        String inputString = inputStringField.getText();
-//        if (automaton != null) {
-//            boolean isValid = automaton.isValidString(inputString);
-//            outputArea.append("String '" + inputString + "' is " + (isValid ? "valid." : "invalid.") + "\n");
-//        } else {
-//            outputArea.append("Automaton not created.\n");
-//        }
-//    }
     private void validateString() {
         String inputString = inputStringField.getText();
         if (automaton != null) {
@@ -218,235 +209,96 @@ class DrawPanel extends JPanel {
         }
     }
 
-//    private void drawAutomaton(Graphics g) {
-//        Graphics2D g2d = (Graphics2D) g;
-//        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//        // Dibujar los estados como círculos
-//        int radius = 30;
-//        int xOffset = 100;
-//        int yOffset = 100;
-//        int gap = 100;
-//        int i = 0;
-//
-//        Map<State, Point> statePositions = new HashMap<>();
-//
-//        for (State state : automaton.getStates()) {
-//            int x = xOffset + i * gap;
-//            int y = yOffset;
-//            g2d.drawOval(x, y, radius * 2, radius * 2);
-//            g2d.drawString(state.getName(), x + radius - 10, y + radius);
-//
-//            // Marcar el estado inicial con una flecha visible
-//            if (state.equals(automaton.getInitialState())) {
-//                // Cambiar el color de la flecha a rojo
-//                g2d.setColor(Color.RED);
-//
-//                // Ajustamos la flecha para que se dibuje más a la izquierda del círculo del estado inicial
-//                int arrowXStart = x - 70;  // Alejamos la flecha más a la izquierda del círculo
-//                int arrowXEnd = x - radius;  // La flecha termina en el borde del círculo
-//                int arrowY = y + radius;   // Alineamos verticalmente la flecha con el centro del círculo
-//
-//                // Dibujar la línea de la flecha
-//                g2d.drawLine(arrowXStart, arrowY, arrowXEnd, arrowY);
-//
-//                // Dibujar la cabeza de la flecha como un triángulo
-//                int[] arrowHeadX = {arrowXEnd, arrowXEnd + 10, arrowXEnd + 10};
-//                int[] arrowHeadY = {arrowY, arrowY - 5, arrowY + 5};
-//                g2d.fillPolygon(arrowHeadX, arrowHeadY, 3);
-//
-//                // Restablecer el color a negro después de dibujar la flecha
-//                g2d.setColor(Color.BLACK);
-//            }
-//
-//            // Dibujar estados finales con doble círculo
-//            if (state.isFinal()) {
-//                g2d.drawOval(x + 3, y + 3, radius * 2 - 6, radius * 2 - 6);
-//            }
-//
-//            statePositions.put(state, new Point(x + radius, y + radius));
-//            i++;
-//        }
-//
-//        // Dibujar las transiciones
-//        for (Transition transition : automaton.getTransitions()) {
-//            Point origin = statePositions.get(transition.getOrigin());
-//            Point destination = statePositions.get(transition.getDestination());
-//            QuadCurve2D curve = new QuadCurve2D.Float(
-//                    origin.x, origin.y,
-//                    (origin.x + destination.x) / 2, origin.y - 50, // Punto de control para la curva
-//                    destination.x, destination.y
-//            );
-//            g2d.draw(curve);
-//            g2d.drawString(String.valueOf(transition.getSymbol()),
-//                    (origin.x + destination.x) / 2,
-//                    (origin.y + destination.y) / 2 - 10);
-//        }
-//    }
-
-//    private void drawAutomaton(Graphics g) {
-//        Graphics2D g2d = (Graphics2D) g;
-//        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//
-//        // Dibujar los estados como círculos, dispersándolos en un patrón circular
-//        int radius = 30;
-//        int panelWidth = getWidth();
-//        int panelHeight = getHeight();
-//        int centerX = panelWidth / 2;
-//        int centerY = panelHeight / 2;
-//        int circleRadius = 200;  // Radio del círculo en el que se disponen los estados
-//        int stateCount = automaton.getStates().size();
-//        double angleStep = 2 * Math.PI / stateCount;  // Ángulo entre cada estado
-//
-//        Map<State, Point> statePositions = new HashMap<>();
-//        int i = 0;
-//
-//        for (State state : automaton.getStates()) {
-//            // Calcular la posición de cada estado en un círculo
-//            double angle = i * angleStep;
-//            int x = (int) (centerX + circleRadius * Math.cos(angle) - radius);
-//            int y = (int) (centerY + circleRadius * Math.sin(angle) - radius);
-//            g2d.drawOval(x, y, radius * 2, radius * 2);
-//            g2d.drawString(state.getName(), x + radius - 10, y + radius);
-//
-//            // Marcar el estado inicial con una flecha visible
-//            if (state.equals(automaton.getInitialState())) {
-//                g2d.setColor(Color.RED);
-//                int arrowXStart = x - 70;
-//                int arrowXEnd = x - radius;
-//                int arrowY = y + radius;
-//                g2d.drawLine(arrowXStart, arrowY, arrowXEnd, arrowY);
-//                int[] arrowHeadX = {arrowXEnd, arrowXEnd + 10, arrowXEnd + 10};
-//                int[] arrowHeadY = {arrowY, arrowY - 5, arrowY + 5};
-//                g2d.fillPolygon(arrowHeadX, arrowHeadY, 3);
-//                g2d.setColor(Color.BLACK);
-//            }
-//
-//            // Dibujar estados finales con doble círculo
-//            if (state.isFinal()) {
-//                g2d.drawOval(x + 3, y + 3, radius * 2 - 6, radius * 2 - 6);
-//            }
-//
-//            statePositions.put(state, new Point(x + radius, y + radius));  // Guardar la posición
-//            i++;
-//        }
-//
-//        // Dibujar las transiciones
-//        for (Transition transition : automaton.getTransitions()) {
-//            Point origin = statePositions.get(transition.getOrigin());
-//            Point destination = statePositions.get(transition.getDestination());
-//
-//            // Crear una curva entre el estado origen y destino
-//            QuadCurve2D curve = new QuadCurve2D.Float(
-//                    origin.x, origin.y,
-//                    (origin.x + destination.x) / 2, (origin.y + destination.y) / 2 - 50,  // Ajustar la curvatura
-//                    destination.x, destination.y
-//            );
-//            g2d.draw(curve);
-//
-//            // Dibujar el símbolo en el punto medio de la curva
-//            int midX = (origin.x + destination.x) / 2;
-//            int midY = (origin.y + destination.y) / 2;
-//            g2d.drawString(String.valueOf(transition.getSymbol()), midX, midY - 15); // Elevar más el texto para evitar superposición
-//        }
-//    }
-
     private void drawAutomaton(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Dibujar los estados como círculos, dispersándolos en un patrón circular
         int radius = 30;
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         int centerX = panelWidth / 2;
         int centerY = panelHeight / 2;
-        int circleRadius = 200;  // Radio del círculo en el que se disponen los estados
+        int circleRadius = 200;
         int stateCount = automaton.getStates().size();
-        double angleStep = 2 * Math.PI / stateCount;  // Ángulo entre cada estado
+        double angleStep = 2 * Math.PI / stateCount;
 
         Map<State, Point> statePositions = new HashMap<>();
         int i = 0;
 
+        // Dibujar los estados
         for (State state : automaton.getStates()) {
-            // Calcular la posición de cada estado en un círculo
             double angle = i * angleStep;
             int x = (int) (centerX + circleRadius * Math.cos(angle) - radius);
             int y = (int) (centerY + circleRadius * Math.sin(angle) - radius);
             g2d.drawOval(x, y, radius * 2, radius * 2);
             g2d.drawString(state.getName(), x + radius - 10, y + radius);
 
-            // Marcar el estado inicial con una flecha visible
+            // Flecha de estado inicial
             if (state.equals(automaton.getInitialState())) {
                 g2d.setColor(Color.RED);
-
-                // Calcular la posición de la flecha (fuera del círculo)
-                int arrowXStart = x - 70;  // Mantener el inicio de la línea más a la izquierda
-                int arrowXEnd = x - radius;  // La flecha termina en el borde del círculo
-                int arrowY = y + radius;  // Alineada verticalmente con el centro del estado
-
-                // Dibujar la línea de la flecha
+                int arrowXStart = x - 70;
+                int arrowXEnd = x - radius;
+                int arrowY = y + radius;
                 g2d.drawLine(arrowXStart, arrowY, arrowXEnd, arrowY);
-
-                // Dibujar la cabeza de la flecha apuntando hacia la derecha
-                int[] arrowHeadX = {arrowXEnd, arrowXEnd - 10, arrowXEnd - 10}; // Cambiamos el sentido de la punta para que apunte a la derecha
-                int[] arrowHeadY = {arrowY, arrowY - 5, arrowY + 5};  // Mantener las coordenadas de la cabeza de la flecha
-
-                g2d.fillPolygon(arrowHeadX, arrowHeadY, 3);  // Dibujar la cabeza de la flecha
-
-                g2d.setColor(Color.BLACK);  // Restaurar el color original
+                int[] arrowHeadX = {arrowXEnd, arrowXEnd + 10, arrowXEnd + 10};
+                int[] arrowHeadY = {arrowY, arrowY - 5, arrowY + 5};
+                g2d.fillPolygon(arrowHeadX, arrowHeadY, 3);
+                g2d.setColor(Color.BLACK);
             }
 
-            // Dibujar estados finales con doble círculo
+            // Doble círculo para estados finales
             if (state.isFinal()) {
                 g2d.drawOval(x + 3, y + 3, radius * 2 - 6, radius * 2 - 6);
             }
 
-            statePositions.put(state, new Point(x + radius, y + radius));  // Guardar la posición
+            statePositions.put(state, new Point(x + radius, y + radius));
             i++;
         }
 
-        // Dibujar las transiciones
+        // Establecer un color distinto para las auto-transiciones
+        g2d.setColor(Color.BLUE); // Cambia el color si prefieres
+
         for (Transition transition : automaton.getTransitions()) {
             Point origin = statePositions.get(transition.getOrigin());
             Point destination = statePositions.get(transition.getDestination());
 
-            // Calcular los puntos en los bordes de los círculos
-            Point originEdge = getEdgePoint(origin, destination, radius);
-            Point destinationEdge = getEdgePoint(destination, origin, radius);
+            if (origin.equals(destination)) {
+                // Auto-transición: dibujar un bucle alrededor del estado
+                int loopRadius = 40;  // Ajusta el tamaño del bucle
+                int arcX = origin.x - loopRadius / 2; // Ajustar la posición para el arco
+                int arcY = origin.y - loopRadius; // Ajustar para que se dibuje en la parte superior del estado
 
-            // Crear una curva entre el borde del estado origen y destino
-            QuadCurve2D curve = new QuadCurve2D.Float(
-                    originEdge.x, originEdge.y,
-                    (originEdge.x + destinationEdge.x) / 2, (originEdge.y + destinationEdge.y) / 2 - 50,  // Ajustar la curvatura
-                    destinationEdge.x, destinationEdge.y
-            );
-            g2d.draw(curve);
+                // Dibujar el arco de la auto-transición
+                g2d.drawArc(arcX, arcY, loopRadius, loopRadius, 0, 180); // Dibuja un arco en lugar de un arco completo
+                g2d.drawString(String.valueOf(transition.getSymbol()), origin.x + loopRadius / 2, arcY - 10);
+            } else {
+                // Calcular los puntos de inicio y fin en el borde de los estados para transiciones normales
+                double angle = Math.atan2(destination.y - origin.y, destination.x - origin.x);
+                int offsetX = (int) (radius * Math.cos(angle));
+                int offsetY = (int) (radius * Math.sin(angle));
 
-            // Dibujar el símbolo en el punto medio de la curva
-            int midX = (originEdge.x + destinationEdge.x) / 2;
-            int midY = (originEdge.y + destinationEdge.y) / 2;
-            g2d.drawString(String.valueOf(transition.getSymbol()), midX, midY - 15); // Elevar más el texto para evitar superposición
+                Point start = new Point(origin.x + offsetX, origin.y + offsetY);
+                Point end = new Point(destination.x - offsetX, destination.y - offsetY);
+
+                // Dibujar la curva entre los estados ajustada a los bordes
+                QuadCurve2D curve = new QuadCurve2D.Float(
+                        start.x, start.y,
+                        (start.x + end.x) / 2, (start.y + end.y) / 2 - 50,  // Punto de control para la curva
+                        end.x, end.y
+                );
+                g2d.draw(curve);
+
+                // Dibujar el símbolo de la transición en la curva
+                g2d.drawString(String.valueOf(transition.getSymbol()),
+                        (start.x + end.x) / 2,
+                        (start.y + end.y) / 2 - 10);
+            }
         }
-    }
 
-    /**
-     * Método auxiliar para calcular el punto en el borde del círculo.
-     */
-    private Point getEdgePoint(Point origin, Point destination, int radius) {
-        double dx = destination.x - origin.x;
-        double dy = destination.y - origin.y;
-        double distance = Math.sqrt(dx * dx + dy * dy);
-        double ratio = radius / distance;
-        int edgeX = (int) (origin.x + dx * ratio);
-        int edgeY = (int) (origin.y + dy * ratio);
-        return new Point(edgeX, edgeY);
+        g2d.setColor(Color.BLACK); // Restablecer el color original para otros elementos
     }
-
 
     private void drawValidationResult(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(isValidString ? Color.GREEN : Color.RED);
-        g2d.drawString("String \"" + inputString + "\" is " + (isValidString ? "VALID" : "INVALID"), 20, 20);
+        // Lógica para mostrar el resultado de la validación de la cadena, si es necesario
     }
 }
