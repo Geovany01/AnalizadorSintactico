@@ -223,10 +223,11 @@ class DrawPanel extends JPanel {
         double angleStep = 2 * Math.PI / stateCount;
 
         Map<State, Point> statePositions = new HashMap<>();
-        int i = 0;
+        Map<State, Integer> loopCounts = new HashMap<>(); // Para contar auto-transiciones
 
         // Dibujar los estados
-        for (State state : automaton.getStates()) {
+        for (int i = 0; i < stateCount; i++) {
+            State state = automaton.getStates().toArray(new State[0])[i]; // Obtener el estado en función del índice
             double angle = i * angleStep;
             int x = (int) (centerX + circleRadius * Math.cos(angle) - radius);
             int y = (int) (centerY + circleRadius * Math.sin(angle) - radius);
@@ -252,10 +253,9 @@ class DrawPanel extends JPanel {
             }
 
             statePositions.put(state, new Point(x + radius, y + radius));
-            i++;
+            loopCounts.put(state, 0); // Inicializar contador de auto-transiciones
         }
 
-        // Establecer un color distinto para las auto-transiciones
         g2d.setColor(Color.BLUE); // Cambia el color si prefieres
 
         for (Transition transition : automaton.getTransitions()) {
@@ -264,13 +264,22 @@ class DrawPanel extends JPanel {
 
             if (origin.equals(destination)) {
                 // Auto-transición: dibujar un bucle alrededor del estado
-                int loopRadius = 40;  // Ajusta el tamaño del bucle
-                int arcX = origin.x - loopRadius / 2; // Ajustar la posición para el arco
-                int arcY = origin.y - loopRadius; // Ajustar para que se dibuje en la parte superior del estado
+                int loopCount = loopCounts.get(transition.getOrigin()); // Obtener el contador
+                loopCounts.put(transition.getOrigin(), loopCount + 1); // Incrementar el contador
 
-                // Dibujar el arco de la auto-transición
-                g2d.drawArc(arcX, arcY, loopRadius, loopRadius, 0, 180); // Dibuja un arco en lugar de un arco completo
-                g2d.drawString(String.valueOf(transition.getSymbol()), origin.x + loopRadius / 2, arcY - 10);
+                int loopRadius = 40 + loopCount * 15;  // Ajusta el tamaño del bucle en función de loopCount
+                double angle = Math.toRadians(45 + loopCount * 45); // Ajustar el ángulo para distribuir bucles
+
+                // Calcular las coordenadas en el borde del estado
+                int stateRadius = 30;  // El radio del estado (el tamaño del círculo)
+                int arcX = (int) (origin.x + Math.cos(angle) * (stateRadius + loopRadius));
+                int arcY = (int) (origin.y + Math.sin(angle) * (stateRadius + loopRadius));
+
+                // Dibujar el arco de la auto-transición desde el borde del estado
+                g2d.drawArc(arcX - loopRadius, arcY - loopRadius, 2 * loopRadius, 2 * loopRadius, 0, 360);
+
+                // Dibujar el símbolo de la transición cerca del arco
+                g2d.drawString(String.valueOf(transition.getSymbol()), arcX, arcY - 10);
             } else {
                 // Calcular los puntos de inicio y fin en el borde de los estados para transiciones normales
                 double angle = Math.atan2(destination.y - origin.y, destination.x - origin.x);
