@@ -87,16 +87,6 @@ class AutomatonGUI extends JFrame {
             }
         });
 
-//        JButton showDocumentationButton = new JButton("Show Documentation");
-//        inputPanel.add(showDocumentationButton);
-//
-//        showDocumentationButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                showDocumentation();
-//            }
-//        });
-
         setVisible(true);
     }
 
@@ -162,20 +152,8 @@ class AutomatonGUI extends JFrame {
             JOptionPane.showMessageDialog(this, result);
         } else {
             JOptionPane.showMessageDialog(this, "Automaton not created.\n");
-//            outputArea.append("Automaton not created.\n");
         }
     }
-
-//    private void showDocumentation() {
-//        String documentation = "To enter an AFD or AFN:\n" +
-//                "1. Enter the alphabet symbols (e.g., 'ab').\n" +
-//                "2. Enter the states separated by spaces (e.g., 'q0 q1 q2').\n" +
-//                "3. Specify the initial state.\n" +
-//                "4. Enter the final states separated by spaces (e.g., 'q1').\n" +
-//                "5. Specify transitions in the format 'origin symbol destination', separated by commas (e.g., 'q0 a q1, q1 b q2').\n" +
-//                "6. Enter a string to validate against the automaton.";
-//        outputArea.append(documentation + "\n");
-//    }
 
     public static void main(String[] args) {
         new AutomatonGUI();
@@ -213,12 +191,12 @@ class DrawPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int radius = 30;
+        int radius = 30; // Radio de los círculos que representan los estados
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         int centerX = panelWidth / 2;
         int centerY = panelHeight / 2;
-        int circleRadius = 200;
+        int circleRadius = 200; // Radio del círculo en el que se distribuyen los estados
         int stateCount = automaton.getStates().size();
         double angleStep = 2 * Math.PI / stateCount;
 
@@ -227,7 +205,7 @@ class DrawPanel extends JPanel {
 
         // Dibujar los estados
         for (int i = 0; i < stateCount; i++) {
-            State state = automaton.getStates().toArray(new State[0])[i]; // Obtener el estado en función del índice
+            State state = automaton.getStates().toArray(new State[0])[i];
             double angle = i * angleStep;
             int x = (int) (centerX + circleRadius * Math.cos(angle) - radius);
             int y = (int) (centerY + circleRadius * Math.sin(angle) - radius);
@@ -241,7 +219,7 @@ class DrawPanel extends JPanel {
                 int arrowXEnd = x - radius;
                 int arrowY = y + radius;
                 g2d.drawLine(arrowXStart, arrowY, arrowXEnd, arrowY);
-                int[] arrowHeadX = {arrowXEnd, arrowXEnd + 10, arrowXEnd + 10};
+                int[] arrowHeadX = {arrowXEnd, arrowXEnd - 10, arrowXEnd - 10};
                 int[] arrowHeadY = {arrowY, arrowY - 5, arrowY + 5};
                 g2d.fillPolygon(arrowHeadX, arrowHeadY, 3);
                 g2d.setColor(Color.BLACK);
@@ -301,10 +279,28 @@ class DrawPanel extends JPanel {
                 g2d.drawString(String.valueOf(transition.getSymbol()),
                         (start.x + end.x) / 2,
                         (start.y + end.y) / 2 - 10);
+
+                // Añadir una flecha al final de la transición
+                drawArrow(g2d, start, end);
             }
         }
 
         g2d.setColor(Color.BLACK); // Restablecer el color original para otros elementos
+    }
+
+    private void drawArrow(Graphics2D g2d, Point start, Point end) {
+        int arrowSize = 10; // Tamaño de la flecha
+        double angle = Math.atan2(end.y - start.y, end.x - start.x);
+
+        int xArrow1 = (int) (end.x - arrowSize * Math.cos(angle - Math.PI / 6));
+        int yArrow1 = (int) (end.y - arrowSize * Math.sin(angle - Math.PI / 6));
+        int xArrow2 = (int) (end.x - arrowSize * Math.cos(angle + Math.PI / 6));
+        int yArrow2 = (int) (end.y - arrowSize * Math.sin(angle + Math.PI / 6));
+
+        int[] xPoints = {end.x, xArrow1, xArrow2};
+        int[] yPoints = {end.y, yArrow1, yArrow2};
+
+        g2d.fillPolygon(xPoints, yPoints, 3);
     }
 
     private void drawValidationResult(Graphics g) {
