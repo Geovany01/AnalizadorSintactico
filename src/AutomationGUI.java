@@ -139,6 +139,10 @@ class AutomatonGUI extends JFrame {
             String symbol = (String) model.getValueAt(i, 1);
             String destinationName = (String) model.getValueAt(i, 2);
 
+            if (symbol.isEmpty()) {
+                symbol = "ε";
+            }
+
             State origin = states.stream().filter(e -> e.getName().equals(originName)).findFirst().orElse(null);
             State destination = states.stream().filter(e -> e.getName().equals(destinationName)).findFirst().orElse(null);
 
@@ -253,13 +257,18 @@ class DrawPanel extends JPanel {
             loopCounts.put(state, 0); // Inicializar contador de auto-transiciones
         }
 
-        g2d.setColor(Color.BLUE); // Cambia el color si prefieres
-
         for (Transition transition : automaton.getTransitions()) {
             Point origin = statePositions.get(transition.getOrigin());
             Point destination = statePositions.get(transition.getDestination());
 
             if (origin.equals(destination)) {
+
+                if (transition.getSymbol() == 'ε') {
+                    g2d.setColor(Color.GRAY); // Color diferente para transiciones epsilon
+                } else {
+                    g2d.setColor(Color.BLUE);
+                }
+
                 // Auto-transición: dibujar un bucle alrededor del estado
                 int loopCount = loopCounts.get(transition.getOrigin()); // Obtener el contador
                 loopCounts.put(transition.getOrigin(), loopCount + 1); // Incrementar el contador
@@ -285,6 +294,12 @@ class DrawPanel extends JPanel {
 
                 Point start = new Point(origin.x + offsetX, origin.y + offsetY);
                 Point end = new Point(destination.x - offsetX, destination.y - offsetY);
+
+                if (transition.getSymbol() == 'ε') {
+                    g2d.setColor(Color.GRAY); // Color diferente para transiciones epsilon
+                } else {
+                    g2d.setColor(Color.BLUE);
+                }
 
                 // Dibujar la curva entre los estados ajustada a los bordes
                 QuadCurve2D curve = new QuadCurve2D.Float(
