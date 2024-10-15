@@ -7,13 +7,15 @@ import java.util.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import javax.swing.table.DefaultTableModel;
 
 // Clase principal de la interfaz gráfica
 class AutomatonGUI extends JFrame {
-    private JTextField alphabetField, statesField, initialStateField, finalStatesField, transitionsField, inputStringField;
+    private JTextField alphabetField, statesField, initialStateField, finalStatesField, inputStringField;
     private JTextArea outputArea;
     private Automaton automaton;
     private DrawPanel drawPanel;
+    private JTable transitionsTable;
 
     public AutomatonGUI() {
         setTitle("Automaton Validator");
@@ -21,7 +23,7 @@ class AutomatonGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel inputPanel = new JPanel(new GridLayout(10, 1)); // Aumentar a 10 para incluir documentación
+        JPanel inputPanel = new JPanel(new GridLayout(10, 1));
 
         alphabetField = new JTextField();
         inputPanel.add(new JLabel("Enter the alphabet symbols (e.g., ab):"));
@@ -39,9 +41,24 @@ class AutomatonGUI extends JFrame {
         inputPanel.add(new JLabel("Enter the final states (e.g., q1 q2):"));
         inputPanel.add(finalStatesField);
 
-        transitionsField = new JTextField();
-        inputPanel.add(new JLabel("Enter transitions (e.g., q0 a q1, separate with commas):"));
-        inputPanel.add(transitionsField);
+        // Crear tabla para ingresar transiciones
+        String[] columnNames = {"Origin State", "Symbol", "Destination State"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        transitionsTable = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(transitionsTable);
+        scrollPane.setPreferredSize(new Dimension(300, 1000));
+        inputPanel.add(new JLabel("Enter Transitions:"));
+        inputPanel.add(scrollPane);
+
+        JButton addRowButton = new JButton("Add Transition");
+        inputPanel.add(addRowButton);
+
+        addRowButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.addRow(new Object[]{"", "", ""});
+            }
+        });
 
         JButton createAutomatonButton = new JButton("Create Automaton");
         inputPanel.add(createAutomatonButton);
@@ -115,18 +132,20 @@ class AutomatonGUI extends JFrame {
             });
         }
 
-        String[] transitionsInput = transitionsField.getText().split(",");
         List<Transition> transitions = new ArrayList<>();
-        for (String tInput : transitionsInput) {
-            String[] parts = tInput.trim().split(" ");
-            State origin = states.stream().filter(e -> e.getName().equals(parts[0])).findFirst().orElse(null);
-            char symbol = parts[1].charAt(0);
-            State destination = states.stream().filter(e -> e.getName().equals(parts[2])).findFirst().orElse(null);
+        DefaultTableModel model = (DefaultTableModel) transitionsTable.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String originName = (String) model.getValueAt(i, 0);
+            String symbol = (String) model.getValueAt(i, 1);
+            String destinationName = (String) model.getValueAt(i, 2);
 
-            if (origin != null && destination != null) {
-                transitions.add(new Transition(origin, symbol, destination));
+            State origin = states.stream().filter(e -> e.getName().equals(originName)).findFirst().orElse(null);
+            State destination = states.stream().filter(e -> e.getName().equals(destinationName)).findFirst().orElse(null);
+
+            if (origin != null && destination != null && symbol.length() == 1) {
+                transitions.add(new Transition(origin, symbol.charAt(0), destination));
             } else {
-                outputArea.append("Invalid transition: " + tInput + "\n");
+                outputArea.append("Invalid transition: " + originName + " " + symbol + " " + destinationName + "\n");
             }
         }
 
