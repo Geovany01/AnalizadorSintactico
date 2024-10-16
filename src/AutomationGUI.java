@@ -171,7 +171,7 @@ class AutomatonGUI extends JFrame {
     private void checkDeterministic() {
         if (automaton != null) {
             boolean isDeterministic = automaton.isDeterministic();
-            String result = "The automaton is " + (isDeterministic ? "deterministic." : "non-deterministic.") + "\n";
+            String result = "The automaton is " + (isDeterministic ? "Deterministic (AFD)" : "Non-Deterministic (AFN)") + "\n";
             JOptionPane.showMessageDialog(this, result);
         } else {
             JOptionPane.showMessageDialog(this, "Automaton not created.\n");
