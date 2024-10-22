@@ -224,16 +224,23 @@ class AutomatonGUI extends JFrame {
 
                 if (!destinationName.isEmpty()) {
                     State origin = states.stream().filter(e -> e.getName().equals(originName)).findFirst().orElse(null);
-                    State destination = states.stream().filter(e -> e.getName().equals(destinationName)).findFirst().orElse(null);
 
-                    if (origin != null && destination != null && symbol.length() == 1) {
-                        transitions.add(new Transition(origin, symbol.charAt(0), destination));
-                    } else {
-                        outputArea.append("Invalid transition: " + originName + " " + symbol + " " + destinationName + "\n");
+                    // Separar los destinos si hay más de uno
+                    String[] destinations = destinationName.split(" ");
+
+                    for (String dest : destinations) {
+                        State destination = states.stream().filter(e -> e.getName().equals(dest)).findFirst().orElse(null);
+
+                        if (origin != null && destination != null && symbol.length() == 1) {
+                            transitions.add(new Transition(origin, symbol.charAt(0), destination));
+                        } else {
+                            outputArea.append("Invalid transition: " + originName + " " + symbol + " " + dest + "\n");
+                        }
                     }
                 }
             }
         }
+
 
         automaton = new Automaton(alphabet, states, initialState, finalStates, transitions);
         drawPanel.setAutomaton(automaton);
