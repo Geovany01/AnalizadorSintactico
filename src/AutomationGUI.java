@@ -10,6 +10,14 @@ import java.util.Set;
 import javax.swing.table.DefaultTableModel;
 
 // Clase principal de la interfaz gráfica
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.QuadCurve2D;
+import java.util.*;
+import javax.swing.table.DefaultTableModel;
+
 class AutomatonGUI extends JFrame {
     private JTextField alphabetField, statesField, initialStateField, finalStatesField, inputStringField;
     private JTextArea outputArea;
@@ -19,92 +27,139 @@ class AutomatonGUI extends JFrame {
 
     public AutomatonGUI() {
         setTitle("Automaton Validator");
-        setSize(800, 600);
+        setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel inputPanel = new JPanel(new GridLayout(10, 1));
+        // Colores y fuente personalizados
+        Color backgroundColor = new Color(245, 245, 245);
+        Color buttonColor = new Color(100, 149, 237);
+        Color panelColor = new Color(230, 230, 250);
+        Font font = new Font("SansSerif", Font.PLAIN, 14);
+        Font buttonFont = new Font("SansSerif", Font.BOLD, 14);
+
+        // Panel superior para título
+        JLabel titleLabel = new JLabel("Automaton Validator", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        titleLabel.setForeground(new Color(60, 63, 65));
+        add(titleLabel, BorderLayout.NORTH);
+
+        // Panel izquierdo para entrada de datos
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        inputPanel.setBackground(panelColor);
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         alphabetField = new JTextField();
-        inputPanel.add(new JLabel("Enter the alphabet symbols (e.g., ab):"));
-        inputPanel.add(alphabetField);
+        addLabeledField("Alphabet (e.g., ab):", alphabetField, inputPanel, gbc, 0);
 
         statesField = new JTextField();
-        inputPanel.add(new JLabel("Enter the states (e.g., q0 q1 q2):"));
-        inputPanel.add(statesField);
+        addLabeledField("States (e.g., q0 q1 q2):", statesField, inputPanel, gbc, 1);
 
         initialStateField = new JTextField();
-        inputPanel.add(new JLabel("Enter the initial state:"));
-        inputPanel.add(initialStateField);
+        addLabeledField("Initial State:", initialStateField, inputPanel, gbc, 2);
 
         finalStatesField = new JTextField();
-        inputPanel.add(new JLabel("Enter the final states (e.g., q1 q2):"));
-        inputPanel.add(finalStatesField);
+        addLabeledField("Final States (e.g., q1 q2):", finalStatesField, inputPanel, gbc, 3);
 
-        // Crear tabla para ingresar transiciones
-        String[] columnNames = {"Origin State", "Symbol", "Destination State"};
+// Aquí movemos el campo inputStringField a la fila 4.
+        inputStringField = new JTextField();
+        addLabeledField("Validate String:", inputStringField, inputPanel, gbc, 4);
+
+// Transitions table and buttons go below this
+        String[] columnNames = {"Origin", "Symbol", "Destination"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         transitionsTable = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(transitionsTable);
-        scrollPane.setPreferredSize(new Dimension(300, 1000));
-        inputPanel.add(new JLabel("Enter Transitions:"));
-        inputPanel.add(scrollPane);
+        scrollPane.setPreferredSize(new Dimension(300, 100));
+        gbc.gridx = 0;
+        gbc.gridy = 5;  // Mueve la tabla de transiciones a la fila 5 para que siga debajo
+        gbc.gridwidth = 2;
+        inputPanel.add(new JLabel("Transitions:"), gbc);
+        gbc.gridy++;
+        inputPanel.add(scrollPane, gbc);
 
         JButton addRowButton = new JButton("Add Transition");
-        inputPanel.add(addRowButton);
+        addRowButton.setBackground(buttonColor);
+        addRowButton.setFont(buttonFont);
+        addRowButton.setForeground(Color.WHITE);
+        addRowButton.setFocusPainted(false);
+        gbc.gridy++;
+        inputPanel.add(addRowButton, gbc);
 
-        addRowButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.addRow(new Object[]{"", "", ""});
-            }
-        });
+        addRowButton.addActionListener(e -> model.addRow(new Object[]{"", "", ""}));
 
         JButton createAutomatonButton = new JButton("Create Automaton");
-        inputPanel.add(createAutomatonButton);
+        createAutomatonButton.setBackground(buttonColor);
+        createAutomatonButton.setFont(buttonFont);
+        createAutomatonButton.setForeground(Color.WHITE);
+        createAutomatonButton.setFocusPainted(false);
+        gbc.gridy++;
+        inputPanel.add(createAutomatonButton, gbc);
 
-        inputStringField = new JTextField();
-        inputPanel.add(new JLabel("Enter a string to validate:"));
-        inputPanel.add(inputStringField);
+//        inputStringField = new JTextField();
+//        addLabeledField("Validate String:", inputStringField, inputPanel, gbc, 6);
 
-        outputArea = new JTextArea();
-        outputArea.setEditable(false);
-
-        add(new JScrollPane(outputArea), BorderLayout.SOUTH);
         add(inputPanel, BorderLayout.WEST);
 
+        // Panel central para dibujo del autómata
         drawPanel = new DrawPanel();
+        drawPanel.setBackground(Color.WHITE);
         add(drawPanel, BorderLayout.CENTER);
 
-        createAutomatonButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createAutomaton();
-                drawPanel.repaint();
-            }
-        });
+        // Panel inferior para resultados y botones adicionales
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        bottomPanel.setBackground(backgroundColor);
 
         JButton validateStringButton = new JButton("Validate String");
-        inputPanel.add(validateStringButton);
+        customizeButton(validateStringButton, buttonColor, buttonFont);
+        bottomPanel.add(validateStringButton);
 
-        validateStringButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                validateString();
-            }
+        JButton checkDeterministicButton = new JButton("Check Determinism");
+        customizeButton(checkDeterministicButton, buttonColor, buttonFont);
+        bottomPanel.add(checkDeterministicButton);
+
+        outputArea = new JTextArea(3, 40);
+        outputArea.setFont(font);
+        outputArea.setLineWrap(true);
+        outputArea.setWrapStyleWord(true);
+        outputArea.setEditable(false);
+        JScrollPane outputScrollPane = new JScrollPane(outputArea);
+        outputScrollPane.setPreferredSize(new Dimension(800, 80));
+        bottomPanel.add(outputScrollPane);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        createAutomatonButton.addActionListener(e -> {
+            createAutomaton();
+            drawPanel.repaint();
         });
 
-        JButton checkDeterministicButton = new JButton("Check if Deterministic");
-        inputPanel.add(checkDeterministicButton);
-
-        checkDeterministicButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                checkDeterministic();
-            }
-        });
+        validateStringButton.addActionListener(e -> validateString());
+        checkDeterministicButton.addActionListener(e -> checkDeterministic());
 
         setVisible(true);
+    }
+
+    private void addLabeledField(String labelText, JTextField textField, JPanel panel, GridBagConstraints gbc, int row) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+        panel.add(new JLabel(labelText), gbc);
+        gbc.gridx = 1;
+        gbc.gridy = row;
+        gbc.gridwidth = 1;
+        panel.add(textField, gbc);
+    }
+
+    private void customizeButton(JButton button, Color bgColor, Font font) {
+        button.setBackground(bgColor);
+        button.setFont(font);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
     }
 
     private void createAutomaton() {
