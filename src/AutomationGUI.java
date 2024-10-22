@@ -18,6 +18,7 @@ import java.awt.geom.QuadCurve2D;
 import java.util.*;
 import javax.swing.table.DefaultTableModel;
 
+// Clase principal de la interfaz gráfica
 class AutomatonGUI extends JFrame {
     private JTextField alphabetField, statesField, initialStateField, finalStatesField, inputStringField;
     private JTextArea outputArea;
@@ -65,32 +66,32 @@ class AutomatonGUI extends JFrame {
         finalStatesField = new JTextField();
         addLabeledField("Final States (e.g., q1 q2):", finalStatesField, inputPanel, gbc, 3);
 
-// Aquí movemos el campo inputStringField a la fila 4.
+        // Campo para validar la cadena
         inputStringField = new JTextField();
         addLabeledField("Validate String:", inputStringField, inputPanel, gbc, 4);
 
-// Transitions table and buttons go below this
-        String[] columnNames = {"Origin", "Symbol", "Destination"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        // Tabla de transiciones
+        DefaultTableModel model = new DefaultTableModel();
         transitionsTable = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(transitionsTable);
         scrollPane.setPreferredSize(new Dimension(300, 100));
         gbc.gridx = 0;
-        gbc.gridy = 5;  // Mueve la tabla de transiciones a la fila 5 para que siga debajo
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
         inputPanel.add(new JLabel("Transitions:"), gbc);
         gbc.gridy++;
         inputPanel.add(scrollPane, gbc);
 
-        JButton addRowButton = new JButton("Add Transition");
-        addRowButton.setBackground(buttonColor);
-        addRowButton.setFont(buttonFont);
-        addRowButton.setForeground(Color.WHITE);
-        addRowButton.setFocusPainted(false);
+        // Botón para generar la tabla
+        JButton generateTableButton = new JButton("Generate Transition Table");
+        generateTableButton.setBackground(buttonColor);
+        generateTableButton.setFont(buttonFont);
+        generateTableButton.setForeground(Color.WHITE);
+        generateTableButton.setFocusPainted(false);
         gbc.gridy++;
-        inputPanel.add(addRowButton, gbc);
+        inputPanel.add(generateTableButton, gbc);
 
-        addRowButton.addActionListener(e -> model.addRow(new Object[]{"", "", ""}));
+        generateTableButton.addActionListener(e -> generateTransitionTable(model));
 
         JButton createAutomatonButton = new JButton("Create Automaton");
         createAutomatonButton.setBackground(buttonColor);
@@ -99,9 +100,6 @@ class AutomatonGUI extends JFrame {
         createAutomatonButton.setFocusPainted(false);
         gbc.gridy++;
         inputPanel.add(createAutomatonButton, gbc);
-
-//        inputStringField = new JTextField();
-//        addLabeledField("Validate String:", inputStringField, inputPanel, gbc, 6);
 
         add(inputPanel, BorderLayout.WEST);
 
@@ -162,6 +160,35 @@ class AutomatonGUI extends JFrame {
         button.setFocusPainted(false);
     }
 
+    private void generateTransitionTable(DefaultTableModel model) {
+        String alphabetInput = alphabetField.getText();
+        String[] alphabet = alphabetInput.split("");
+
+        String statesInput = statesField.getText();
+        String[] states = statesInput.split(" ");
+
+        model.setRowCount(0); // Limpiar filas existentes
+        model.setColumnCount(0); // Limpiar columnas existentes
+
+        // Añadir columnas para cada símbolo del alfabeto
+        model.addColumn("State");
+        for (String symbol : alphabet) {
+            if (!symbol.trim().isEmpty()) {
+                model.addColumn(symbol);
+            }
+        }
+
+        // Añadir filas para cada estado
+        for (String state : states) {
+            Object[] rowData = new Object[alphabet.length + 1];
+            rowData[0] = state;
+            for (int i = 1; i <= alphabet.length; i++) {
+                rowData[i] = ""; // Inicializar celdas vacías
+            }
+            model.addRow(rowData);
+        }
+    }
+
     private void createAutomaton() {
         String alphabetInput = alphabetField.getText();
         Set<Character> alphabet = new HashSet<>();
@@ -191,20 +218,20 @@ class AutomatonGUI extends JFrame {
         DefaultTableModel model = (DefaultTableModel) transitionsTable.getModel();
         for (int i = 0; i < model.getRowCount(); i++) {
             String originName = (String) model.getValueAt(i, 0);
-            String symbol = (String) model.getValueAt(i, 1);
-            String destinationName = (String) model.getValueAt(i, 2);
+            for (int j = 1; j < model.getColumnCount(); j++) {
+                String symbol = model.getColumnName(j);
+                String destinationName = (String) model.getValueAt(i, j);
 
-            if (symbol.isEmpty()) {
-                symbol = "ε";
-            }
+                if (!destinationName.isEmpty()) {
+                    State origin = states.stream().filter(e -> e.getName().equals(originName)).findFirst().orElse(null);
+                    State destination = states.stream().filter(e -> e.getName().equals(destinationName)).findFirst().orElse(null);
 
-            State origin = states.stream().filter(e -> e.getName().equals(originName)).findFirst().orElse(null);
-            State destination = states.stream().filter(e -> e.getName().equals(destinationName)).findFirst().orElse(null);
-
-            if (origin != null && destination != null && symbol.length() == 1) {
-                transitions.add(new Transition(origin, symbol.charAt(0), destination));
-            } else {
-                outputArea.append("Invalid transition: " + originName + " " + symbol + " " + destinationName + "\n");
+                    if (origin != null && destination != null && symbol.length() == 1) {
+                        transitions.add(new Transition(origin, symbol.charAt(0), destination));
+                    } else {
+                        outputArea.append("Invalid transition: " + originName + " " + symbol + " " + destinationName + "\n");
+                    }
+                }
             }
         }
 
