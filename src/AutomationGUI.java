@@ -1,21 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.QuadCurve2D;
 import java.util.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
-import javax.swing.table.DefaultTableModel;
-
-// Clase principal de la interfaz gráfica
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.QuadCurve2D;
-import java.util.*;
 import javax.swing.table.DefaultTableModel;
 
 // Clase principal de la interfaz gráfica
@@ -27,8 +16,8 @@ class AutomatonGUI extends JFrame {
     private JTable transitionsTable;
 
     public AutomatonGUI() {
-        setTitle("Automaton Validator");
-        setSize(900, 700);
+        setTitle("Analizador Sintáctico AFD - AFN");
+        setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -40,7 +29,7 @@ class AutomatonGUI extends JFrame {
         Font buttonFont = new Font("SansSerif", Font.BOLD, 14);
 
         // Panel superior para título
-        JLabel titleLabel = new JLabel("Automaton Validator", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("ANALIZADOR AFD - AFN", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         titleLabel.setForeground(new Color(60, 63, 65));
@@ -48,6 +37,7 @@ class AutomatonGUI extends JFrame {
 
         // Panel izquierdo para entrada de datos
         JPanel inputPanel = new JPanel(new GridBagLayout());
+        inputPanel.setPreferredSize(new Dimension(500, getHeight())); // Cambia el ancho a 400
         inputPanel.setBackground(panelColor);
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -55,20 +45,21 @@ class AutomatonGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         alphabetField = new JTextField();
-        addLabeledField("Alphabet (e.g., ab):", alphabetField, inputPanel, gbc, 0);
+        alphabetField.setPreferredSize(new Dimension(200, 20));
+        addLabeledField("Alfabeto Separado por Espacios: (Ej. 0 1 2)", alphabetField, inputPanel, gbc, 0);
 
         statesField = new JTextField();
-        addLabeledField("States (e.g., q0 q1 q2):", statesField, inputPanel, gbc, 1);
+        addLabeledField("Conjutno de Estados (Ej. q0 q1 q2):", statesField, inputPanel, gbc, 1);
 
         initialStateField = new JTextField();
-        addLabeledField("Initial State:", initialStateField, inputPanel, gbc, 2);
+        addLabeledField("Estado Inicial:", initialStateField, inputPanel, gbc, 2);
 
         finalStatesField = new JTextField();
-        addLabeledField("Final States (e.g., q1 q2):", finalStatesField, inputPanel, gbc, 3);
+        addLabeledField("Conjunto de Estados Finales (Ej. q1 q2):", finalStatesField, inputPanel, gbc, 3);
 
         // Campo para validar la cadena
         inputStringField = new JTextField();
-        addLabeledField("Validate String:", inputStringField, inputPanel, gbc, 4);
+        addLabeledField("Cadena a Validar:", inputStringField, inputPanel, gbc, 4);
 
         // Tabla de transiciones
         DefaultTableModel model = new DefaultTableModel();
@@ -78,12 +69,12 @@ class AutomatonGUI extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
-        inputPanel.add(new JLabel("Transitions:"), gbc);
+        inputPanel.add(new JLabel("Transiciones:"), gbc);
         gbc.gridy++;
         inputPanel.add(scrollPane, gbc);
 
         // Botón para generar la tabla
-        JButton generateTableButton = new JButton("Generate Transition Table");
+        JButton generateTableButton = new JButton("Generar Tabla de Transiciones");
         generateTableButton.setBackground(buttonColor);
         generateTableButton.setFont(buttonFont);
         generateTableButton.setForeground(Color.WHITE);
@@ -93,7 +84,7 @@ class AutomatonGUI extends JFrame {
 
         generateTableButton.addActionListener(e -> generateTransitionTable(model));
 
-        JButton createAutomatonButton = new JButton("Create Automaton");
+        JButton createAutomatonButton = new JButton("Crear Autómata");
         createAutomatonButton.setBackground(buttonColor);
         createAutomatonButton.setFont(buttonFont);
         createAutomatonButton.setForeground(Color.WHITE);
@@ -112,11 +103,11 @@ class AutomatonGUI extends JFrame {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         bottomPanel.setBackground(backgroundColor);
 
-        JButton validateStringButton = new JButton("Validate String");
+        JButton validateStringButton = new JButton("Validar Cadena");
         customizeButton(validateStringButton, buttonColor, buttonFont);
         bottomPanel.add(validateStringButton);
 
-        JButton checkDeterministicButton = new JButton("Check Determinism");
+        JButton checkDeterministicButton = new JButton("Validar Tipo de Autómata");
         customizeButton(checkDeterministicButton, buttonColor, buttonFont);
         bottomPanel.add(checkDeterministicButton);
 
@@ -128,6 +119,9 @@ class AutomatonGUI extends JFrame {
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
         outputScrollPane.setPreferredSize(new Dimension(800, 80));
         bottomPanel.add(outputScrollPane);
+        outputArea.append("NOTA:\n");
+        outputArea.append("Para el conjunto vacío utilizar el símbolo ε \n");
+        outputArea.append("El símbolo ε debe estar definido en el alfabeto para utilizarlo en las transiciones\n");
 
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -171,7 +165,7 @@ class AutomatonGUI extends JFrame {
         model.setColumnCount(0); // Limpiar columnas existentes
 
         // Añadir columnas para cada símbolo del alfabeto
-        model.addColumn("State");
+        model.addColumn("Estado");
         for (String symbol : alphabet) {
             if (!symbol.trim().isEmpty()) {
                 model.addColumn(symbol);
@@ -234,7 +228,7 @@ class AutomatonGUI extends JFrame {
                         if (origin != null && destination != null && symbol.length() == 1) {
                             transitions.add(new Transition(origin, symbol.charAt(0), destination));
                         } else {
-                            outputArea.append("Invalid transition: " + originName + " " + symbol + " " + dest + "\n");
+                            outputArea.append("Transición Inválida: " + originName + " " + symbol + " " + dest + "\n");
                         }
                     }
                 }
@@ -251,25 +245,22 @@ class AutomatonGUI extends JFrame {
         if (automaton != null) {
             boolean isValid = automaton.isValidString(inputString);
             drawPanel.setInputString(inputString);
-            JOptionPane.showMessageDialog(this, "The string \"" + inputString + "\" is " + (isValid ? "VALID" : "INVALID"));
+            JOptionPane.showMessageDialog(this, "La cadena \"" + inputString + "\" es " + (isValid ? "VALIDA" : "INVALIDA"));
         } else {
-            JOptionPane.showMessageDialog(this, "Automaton is not created yet.");
+            JOptionPane.showMessageDialog(this, "Autómata aún no Creado.");
         }
     }
 
     private void checkDeterministic() {
         if (automaton != null) {
             boolean isDeterministic = automaton.isDeterministic();
-            String result = "The automaton is " + (isDeterministic ? "Deterministic (AFD)" : "Non-Deterministic (AFN)") + "\n";
+            String result = "El Autómata es " + (isDeterministic ? "Determinístico (AFD)" : "No-Determinístico (AFN)") + "\n";
             JOptionPane.showMessageDialog(this, result);
         } else {
-            JOptionPane.showMessageDialog(this, "Automaton not created.\n");
+            JOptionPane.showMessageDialog(this, "Autómata no Creado.\n");
         }
     }
 
-    public static void main(String[] args) {
-        new AutomatonGUI();
-    }
 }
 
 class DrawPanel extends JPanel {

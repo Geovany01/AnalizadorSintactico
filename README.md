@@ -4,25 +4,25 @@ Este proyecto implementa un analizador sintáctico que trabaja con autómatas fi
 
 ## Requisitos
 
-- **Versión de JDK**: JDK 22 (asegúrate de tener esta versión instalada para ejecutar el proyecto correctamente).
+- **Versión de JDK**: JDK 22 (Versión instalada para ejecutar el proyecto correctamente).
 
 ## Ejemplos de AFD (Autómata Finito Determinista)
 
 ### Ejemplo 1: AFD que acepta cadenas con "ab" o "ba"
-- **Estados**: {q0, q1, q2, q3, q4}
 - **Alfabeto**: {a, b}
+- **Estados**: {q0, q1, q2, q3, q4}
 - **Estado inicial**: q0
 - **Estados finales**: {q3, q4}
 
 **Transiciones**:
 - q0 → a → q1
-- q1 → b → q3
 - q0 → b → q2
+- q1 → b → q3
 - q2 → a → q4
 
 ### Ejemplo 2: AFD que acepta cadenas con un patrón específico
-- **Estados**: Q = {q0, q1, q2}
 - **Alfabeto**: Σ = {0, 1}
+- **Estados**: Q = {q0, q1, q2}
 - **Estado inicial**: q0
 - **Estados finales**: F = {q2}
 
@@ -50,22 +50,24 @@ Este proyecto implementa un analizador sintáctico que trabaja con autómatas fi
 ## Ejemplos de AFN (Autómata Finito No Determinista)
 
 ### Ejemplo 1: AFN que acepta cadenas que terminan en "00" o "11"
-- **Estados**: {q0, q1, q2, q3, q4}
 - **Alfabeto**: {0, 1}
+- **Estados**: {q0, q1, q2, q3, q4}
 - **Estado inicial**: q0
 - **Estados finales**: {q2, q4}
 
 **Transiciones**:
-- q0 → 0 → q1
-- q1 → 0 → q2
-- q0 → 1 → q3
-- q3 → 1 → q4
 - q0 → 0 → q0
+- q0 → 0 → q1
 - q0 → 1 → q0
+- q0 → 1 → q3
+- q1 → 0 → q2
+- q3 → 1 → q4
+
+
 
 ### Ejemplo 2: AFN que acepta el lenguaje "a*(b|c)"
-- **Estados**: {q0, q1, q2}
 - **Alfabeto**: {a, b, c}
+- **Estados**: {q0, q1, q2}
 - **Estado inicial**: q0
 - **Estados finales**: {q2}
 
@@ -73,11 +75,11 @@ Este proyecto implementa un analizador sintáctico que trabaja con autómatas fi
 - q0 → a → q0
 - q0 → b → q1
 - q0 → c → q1
-- q1 → λ → q2 (transición vacía)
+- q1 → ε → q2 (transición vacía)
 
 ### Ejemplo 3: AFN que acepta cualquier combinación de 'a' y 'b' con una transición epsilon
-- **Estados**: {q0, q1}
 - **Alfabeto**: {a, b}
+- **Estados**: {q0, q1}
 - **Estado inicial**: q0
 - **Estados finales**: {q1}
 
