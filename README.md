@@ -99,4 +99,7 @@ Este proyecto implementa un analizador sintáctico que trabaja con autómatas fi
 ---
 
 ## Autor
-https://github.com/Geovany01.
+https://github.com/Geovany01
+
+https://github.com/Geovany01/AnalizadorSintactico
+
